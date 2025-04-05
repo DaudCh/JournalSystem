@@ -25,20 +25,18 @@ namespace JournalSystem.Core.DTOS.JournalEntry
     {
         public int JournalNumber { get; set; }
         public string JournalType { get; set; }
-        public string Status { get; set; } = "Draft";
         public string Period { get; set; }
         public DateTime PostingDate { get; set; }
         public DateTime DocumentDate { get; set; }
+        public string Status { get; set; }
         public int CurrencyId { get; set; }
         public float ExchangeRate { get; set; }
-        public List<CreateJournalLineDTO> JournalLines { get; set; } = new();
     }
-
 
     public class UpdateJournalEntryDTO
     {
         public int Id { get; set; }
-        public string JournalType { get; set; }  // Changed from int
+        public string JournalType { get; set; }
         public string Period { get; set; }
         public DateTime PostingDate { get; set; }
         public DateTime DocumentDate { get; set; }

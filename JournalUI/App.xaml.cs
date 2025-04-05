@@ -27,7 +27,7 @@ namespace JournalUI
                     services.AddDbContext<ApplicationDbContext>(options =>
                         options.UseSqlServer(connectionString));
 
-
+                    // Register services and repositories
                     services.AddScoped<IJournalEntryRepository, JournalEntryRepository>();
                     services.AddScoped<IJournalEntryService, JournalEntryService>();
                     services.AddScoped<IJournalLineRepository, JournalLineRepository>();
@@ -45,7 +45,6 @@ namespace JournalUI
 
 
                     services.AddSingleton<MainWindow>();
-                    services.AddTransient<AddJournalEntryWindow>();
                 })
                 .Build();
 

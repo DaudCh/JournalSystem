@@ -3,7 +3,10 @@ using JournalSystem.Core.DTOS.Currency;
 using JournalSystem.Core.Entities;
 using JournalSystem.Core.Repositories;
 using JournalSystem.Core.Services;
-
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace JournalSystem.Services
 {

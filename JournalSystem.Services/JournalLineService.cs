@@ -1,7 +1,13 @@
 ﻿using AutoMapper;
 using JournalSystem.Core.DTOS.JournalLines;
+using JournalSystem.Core.Entities;
 using JournalSystem.Core.Repositories;
 using JournalSystem.Core.Services;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace JournalSystem.Services
 {

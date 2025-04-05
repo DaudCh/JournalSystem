@@ -22,56 +22,6 @@ namespace JournalSystem.Repositories.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("JournalLine", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int>("AccountId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("CostCenterId")
-                        .HasColumnType("int");
-
-                    b.Property<float>("Credit")
-                        .HasColumnType("real");
-
-                    b.Property<float>("Debit")
-                        .HasColumnType("real");
-
-                    b.Property<string>("Description")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<int>("DimensionId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("JournalEntryId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("LineNumber")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Reference")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AccountId");
-
-                    b.HasIndex("CostCenterId");
-
-                    b.HasIndex("DimensionId");
-
-                    b.HasIndex("JournalEntryId");
-
-                    b.ToTable("JournalLines");
-                });
-
             modelBuilder.Entity("JournalSystem.Core.Entities.Account", b =>
                 {
                     b.Property<int>("Id")
@@ -79,6 +29,9 @@ namespace JournalSystem.Repositories.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccountID")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -96,6 +49,9 @@ namespace JournalSystem.Repositories.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CostCenterID")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -133,6 +89,9 @@ namespace JournalSystem.Repositories.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DimensionID")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -190,39 +149,69 @@ namespace JournalSystem.Repositories.Migrations
                     b.ToTable("JournalEntries");
                 });
 
-            modelBuilder.Entity("JournalLine", b =>
+            modelBuilder.Entity("JournalSystem.Core.Entities.JournalLine", b =>
                 {
-                    b.HasOne("JournalSystem.Core.Entities.Account", "Account")
-                        .WithMany("JournalLines")
-                        .HasForeignKey("AccountId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
 
-                    b.HasOne("JournalSystem.Core.Entities.CostCenter", "CostCenter")
-                        .WithMany("JournalLines")
-                        .HasForeignKey("CostCenterId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.HasOne("JournalSystem.Core.Entities.Dimension", "Dimension")
-                        .WithMany("JournalLines")
-                        .HasForeignKey("DimensionId")
-                        .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                    b.Property<int>("AccountId")
+                        .HasColumnType("int");
 
-                    b.HasOne("JournalSystem.Core.Entities.JournalEntry", "JournalEntry")
-                        .WithMany("JournalLines")
-                        .HasForeignKey("JournalEntryId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.Property<int?>("AccountId1")
+                        .HasColumnType("int");
 
-                    b.Navigation("Account");
+                    b.Property<int>("CostCenterId")
+                        .HasColumnType("int");
 
-                    b.Navigation("CostCenter");
+                    b.Property<int?>("CostCenterId1")
+                        .HasColumnType("int");
 
-                    b.Navigation("Dimension");
+                    b.Property<float>("Credit")
+                        .HasColumnType("real");
 
-                    b.Navigation("JournalEntry");
+                    b.Property<float>("Debit")
+                        .HasColumnType("real");
+
+                    b.Property<string>("Description")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("DimensionId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DimensionId1")
+                        .HasColumnType("int");
+
+                    b.Property<int>("JournalEntryId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("LineNumber")
+                        .HasColumnType("int");
+
+                    b.Property<string>("Reference")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AccountId");
+
+                    b.HasIndex("AccountId1");
+
+                    b.HasIndex("CostCenterId");
+
+                    b.HasIndex("CostCenterId1");
+
+                    b.HasIndex("DimensionId");
+
+                    b.HasIndex("DimensionId1");
+
+                    b.HasIndex("JournalEntryId");
+
+                    b.ToTable("JournalLines");
                 });
 
             modelBuilder.Entity("JournalSystem.Core.Entities.JournalEntry", b =>
@@ -238,6 +227,53 @@ namespace JournalSystem.Repositories.Migrations
                         .HasForeignKey("CurrencyId1");
 
                     b.Navigation("Currency");
+                });
+
+            modelBuilder.Entity("JournalSystem.Core.Entities.JournalLine", b =>
+                {
+                    b.HasOne("JournalSystem.Core.Entities.Account", "Account")
+                        .WithMany()
+                        .HasForeignKey("AccountId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("JournalSystem.Core.Entities.Account", null)
+                        .WithMany("JournalLines")
+                        .HasForeignKey("AccountId1");
+
+                    b.HasOne("JournalSystem.Core.Entities.CostCenter", "CostCenter")
+                        .WithMany()
+                        .HasForeignKey("CostCenterId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("JournalSystem.Core.Entities.CostCenter", null)
+                        .WithMany("JournalLines")
+                        .HasForeignKey("CostCenterId1");
+
+                    b.HasOne("JournalSystem.Core.Entities.Dimension", "Dimension")
+                        .WithMany()
+                        .HasForeignKey("DimensionId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("JournalSystem.Core.Entities.Dimension", null)
+                        .WithMany("JournalLines")
+                        .HasForeignKey("DimensionId1");
+
+                    b.HasOne("JournalSystem.Core.Entities.JournalEntry", "JournalEntry")
+                        .WithMany("JournalLines")
+                        .HasForeignKey("JournalEntryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Account");
+
+                    b.Navigation("CostCenter");
+
+                    b.Navigation("Dimension");
+
+                    b.Navigation("JournalEntry");
                 });
 
             modelBuilder.Entity("JournalSystem.Core.Entities.Account", b =>
