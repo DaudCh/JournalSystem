@@ -4,6 +4,7 @@ using JournalSystem.Repositories.Context;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace JournalSystem.Repositories.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250404124903_parentlink")]
+    partial class parentlink
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -33,7 +36,13 @@ namespace JournalSystem.Repositories.Migrations
                     b.Property<int>("AccountId")
                         .HasColumnType("int");
 
+                    b.Property<int?>("AccountId1")
+                        .HasColumnType("int");
+
                     b.Property<int>("CostCenterId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("CostCenterId1")
                         .HasColumnType("int");
 
                     b.Property<float>("Credit")
@@ -47,6 +56,9 @@ namespace JournalSystem.Repositories.Migrations
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("DimensionId")
+                        .HasColumnType("int");
+
+                    b.Property<int?>("DimensionId1")
                         .HasColumnType("int");
 
                     b.Property<int>("JournalEntryId")
@@ -63,9 +75,15 @@ namespace JournalSystem.Repositories.Migrations
 
                     b.HasIndex("AccountId");
 
+                    b.HasIndex("AccountId1");
+
                     b.HasIndex("CostCenterId");
 
+                    b.HasIndex("CostCenterId1");
+
                     b.HasIndex("DimensionId");
+
+                    b.HasIndex("DimensionId1");
 
                     b.HasIndex("JournalEntryId");
 
@@ -79,6 +97,9 @@ namespace JournalSystem.Repositories.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("AccountId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -96,6 +117,9 @@ namespace JournalSystem.Repositories.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("CostCenterId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -133,6 +157,9 @@ namespace JournalSystem.Repositories.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("DimensionId")
+                        .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
@@ -193,22 +220,34 @@ namespace JournalSystem.Repositories.Migrations
             modelBuilder.Entity("JournalLine", b =>
                 {
                     b.HasOne("JournalSystem.Core.Entities.Account", "Account")
-                        .WithMany("JournalLines")
+                        .WithMany()
                         .HasForeignKey("AccountId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("JournalSystem.Core.Entities.CostCenter", "CostCenter")
+                    b.HasOne("JournalSystem.Core.Entities.Account", null)
                         .WithMany("JournalLines")
+                        .HasForeignKey("AccountId1");
+
+                    b.HasOne("JournalSystem.Core.Entities.CostCenter", "CostCenter")
+                        .WithMany()
                         .HasForeignKey("CostCenterId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
-                    b.HasOne("JournalSystem.Core.Entities.Dimension", "Dimension")
+                    b.HasOne("JournalSystem.Core.Entities.CostCenter", null)
                         .WithMany("JournalLines")
+                        .HasForeignKey("CostCenterId1");
+
+                    b.HasOne("JournalSystem.Core.Entities.Dimension", "Dimension")
+                        .WithMany()
                         .HasForeignKey("DimensionId")
                         .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
+
+                    b.HasOne("JournalSystem.Core.Entities.Dimension", null)
+                        .WithMany("JournalLines")
+                        .HasForeignKey("DimensionId1");
 
                     b.HasOne("JournalSystem.Core.Entities.JournalEntry", "JournalEntry")
                         .WithMany("JournalLines")

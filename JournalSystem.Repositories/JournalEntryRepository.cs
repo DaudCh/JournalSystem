@@ -2,11 +2,7 @@
 using JournalSystem.Core.Repositories;
 using JournalSystem.Repositories.Context;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+
 
 namespace JournalSystem.Repositories
 {
@@ -68,7 +64,13 @@ namespace JournalSystem.Repositories
             var journal = await _context.JournalEntries
                          .Include(j => j.JournalLines) 
                          .FirstOrDefaultAsync(j => j.Id == id, cancellationToken); 
-                          return journal;
+                         return journal;
         }
+        public async Task AddJournalLinesAsync(IEnumerable<JournalLine> journalLines, CancellationToken cancellationToken)
+        {
+            await _context.JournalLines.AddRangeAsync(journalLines, cancellationToken); 
+            await _context.SaveChangesAsync(cancellationToken);
+        }
+
     }
 }

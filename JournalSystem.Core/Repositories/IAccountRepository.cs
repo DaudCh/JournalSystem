@@ -14,5 +14,6 @@ namespace JournalSystem.Core.Repositories
         Task AddAsync(Account account, CancellationToken cancellationToken = default);
         Task UpdateAsync(Account account, CancellationToken cancellationToken = default);
         Task DeleteAsync(int id, CancellationToken cancellationToken = default);
+
     }
 }

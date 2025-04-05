@@ -14,7 +14,7 @@ namespace JournalSystem
 
         static async Task Main(string[] args)
         {
-            Console.WriteLine("Starting Task Management System...");
+            Console.WriteLine("Starting Journal System..");
 
             var host = CreateHostBuilder(args).Build();
 

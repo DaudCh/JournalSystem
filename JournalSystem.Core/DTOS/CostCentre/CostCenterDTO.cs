@@ -14,14 +14,12 @@ namespace JournalSystem.Core.DTOS.CostCentre
     public class UpdateCostCenterDTO
     {
         public int Id { get; set; }
-        public int CostCenterID { get; set; }
         public string Name { get; set; }
     }
 
     public class CostCenterResponseDTO
     {
         public int Id { get; set; }
-        public int CostCenterID { get; set; }
         public string Name { get; set; }
     }
 }

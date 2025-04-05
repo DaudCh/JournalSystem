@@ -9,10 +9,7 @@ namespace JournalSystem.Core.Entities
     public class CostCenter
     {
         public int Id { get; set; }
-        public int CostCenterID { get; set; }
         public string Name { get; set; }
-
-        
         public ICollection<JournalLine> JournalLines { get; set; }
     }
 

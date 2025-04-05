@@ -2,10 +2,7 @@
 using JournalSystem.Core.Repositories;
 using JournalSystem.Repositories.Context;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Threading;
-using System.Threading.Tasks;
+
 
 namespace JournalSystem.Repositories
 {

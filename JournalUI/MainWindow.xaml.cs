@@ -1,26 +1,14 @@
-﻿using JournalSystem.Core.DTOS.JournalEntry;
-using JournalSystem.Core.Services;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
-using System.Windows;
+﻿using JournalSystem.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
+using System.Windows;
 
 namespace JournalUI
 {
     public partial class MainWindow : Window
     {
-        private readonly IJournalEntryService _journalEntryService;
-
         public MainWindow()
         {
             InitializeComponent();
-
-
-            _journalEntryService = App.ServiceProvider.GetRequiredService<IJournalEntryService>();
-
-
             LoadJournalEntries();
         }
 
@@ -31,30 +19,35 @@ namespace JournalUI
                 txtLoading.Visibility = Visibility.Visible;
                 dgJournalList.IsEnabled = false;
 
-                var journalEntries = await _journalEntryService.GetAllAsync();
-
-                if (!journalEntries.Any())
+                using (var scope = App.ServiceProvider.CreateScope())
                 {
-                    MessageBox.Show("No journal entries found.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
-                }
+                    var journalEntryService = scope.ServiceProvider.GetRequiredService<IJournalEntryService>();
+                    var journalEntries = await journalEntryService.GetAllAsync();
 
-                dgJournalList.ItemsSource = journalEntries;
+                    if (!journalEntries.Any())
+                    {
+                        MessageBox.Show("No journal entries found.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                    }
+
+                    dgJournalList.ItemsSource = journalEntries;
+                }
             }
             catch (Exception ex)
             {
                 MessageBox.Show($"Error loading journal entries: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
             }
-
+            finally
+            {
+                txtLoading.Visibility = Visibility.Hidden;
+                dgJournalList.IsEnabled = true;
+            }
         }
+
         private void AddEntry_Click(object sender, RoutedEventArgs e)
         {
-            AddJournalEntryWindow addJournalEntryWindow = new AddJournalEntryWindow();
-            addJournalEntryWindow.ShowDialog();
+            var addWindow = App.ServiceProvider.GetRequiredService<AddJournalEntryWindow>();
+            addWindow.ShowDialog();
+            LoadJournalEntries();
         }
-
-
-
-
-
     }
 }
