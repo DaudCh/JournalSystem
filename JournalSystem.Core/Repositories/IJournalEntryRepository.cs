@@ -15,6 +15,7 @@ namespace JournalSystem.Core.Repositories
         Task UpdateAsync(JournalEntry journalEntry, CancellationToken cancellationToken = default);
         Task DeleteAsync(int id, CancellationToken cancellationToken = default);
         Task<JournalEntry> GetJournalEntryWithLinesAsync(int id, CancellationToken cancellationToken = default);
+        Task AddJournalLinesAsync(IEnumerable<JournalLine> journalLines, CancellationToken cancellationToken);
     }
 
 }
