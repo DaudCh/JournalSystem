@@ -11,8 +11,6 @@ namespace JournalSystem.Core.Entities
         public int Id { get; set; }
         public int CurrencyCode { get; set; }
         public string Name { get; set; }
-
-        
         public ICollection<JournalEntry> JournalEntries { get; set; }
     }
 

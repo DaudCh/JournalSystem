@@ -14,5 +14,6 @@ namespace JournalSystem.Core.Repositories
         Task AddAsync(Dimension dimension, CancellationToken cancellationToken = default);
         Task UpdateAsync(Dimension dimension, CancellationToken cancellationToken = default);
         Task DeleteAsync(int id, CancellationToken cancellationToken = default);
+
     }
 }

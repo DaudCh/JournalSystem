@@ -9,9 +9,7 @@ namespace JournalSystem.Core.Entities
     public class Dimension
     {
         public int Id { get; set; }
-        public int DimensionID { get; set; }
         public string Name { get; set; }
-
         public ICollection<JournalLine> JournalLines { get; set; }
     }
 
