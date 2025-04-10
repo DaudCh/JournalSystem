@@ -9,13 +9,25 @@
             <TextBlock Name="txtLoading" Text="Loading journal entries..." FontSize="16" Visibility="Collapsed" Foreground="Gray" />
             <DataGrid x:Name="dgJournalList" AutoGenerateColumns="False" Height="250">
                 <DataGrid.Columns>
-                    <DataGridTextColumn Header="Journal Number" Binding="{Binding JournalNumber}" Width="100"/>
+                    <DataGridTemplateColumn Header="Journal Number" Width="100">
+                        <DataGridTemplateColumn.CellTemplate>
+                            <DataTemplate>
+                                <TextBlock>
+                        <Hyperlink Click="Hyperlink_Click">
+                            <TextBlock Text="{Binding JournalNumber, StringFormat='#{0}'}"/>
+                        </Hyperlink>
+                    </TextBlock>
+                            </DataTemplate>
+                        </DataGridTemplateColumn.CellTemplate>
+                    </DataGridTemplateColumn>
                     <DataGridTextColumn Header="Journal Type" Binding="{Binding JournalType}" Width="150"/>
                     <DataGridTextColumn Header="Period" Binding="{Binding Period}" Width="100"/>
                     <DataGridTextColumn Header="Posting Date" Binding="{Binding PostingDate, StringFormat=d}" Width="120"/>
                     <DataGridTextColumn Header="Document Date" Binding="{Binding DocumentDate, StringFormat=d}" Width="120"/>
                     <DataGridTextColumn Header="Status" Binding="{Binding Status}" Width="100"/>
-                    <DataGridTextColumn Header="Currency" Binding="{Binding Currency}" Width="100"/>
+                    <DataGridTextColumn Header="Currency" Binding="{Binding CurrencyName}" Width="100"/>
+
+
                     <DataGridTextColumn Header="Total Debit" Binding="{Binding TotalDebit}" Width="100"/>
                     <DataGridTextColumn Header="Total Credit" Binding="{Binding TotalCredit}" Width="100"/>
                 </DataGrid.Columns>

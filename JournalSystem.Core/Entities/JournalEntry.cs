@@ -19,6 +19,7 @@ namespace JournalSystem.Core.Entities
         public float ExchangeRate { get; set; }
         public Currency Currency { get; set; }
         public ICollection<JournalLine> JournalLines { get; set; }
+
     }
 
 }

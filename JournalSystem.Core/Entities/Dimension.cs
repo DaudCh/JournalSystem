@@ -10,7 +10,8 @@ namespace JournalSystem.Core.Entities
     {
         public int Id { get; set; }
         public string Name { get; set; }
-        public ICollection<JournalLine> JournalLines { get; set; }
+        public ICollection<JournalLine> JournalLines { get; set; } 
+
     }
 
 }

@@ -1,6 +1,8 @@
-﻿using JournalSystem.Core.Services;
+﻿using JournalSystem.Core.DTOS.JournalEntry;
+using JournalSystem.Core.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System.Windows;
+using System.Windows.Documents;
 
 namespace JournalUI
 {
@@ -16,38 +18,62 @@ namespace JournalUI
         {
             try
             {
-                txtLoading.Visibility = Visibility.Visible;
-                dgJournalList.IsEnabled = false;
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    txtLoading.Visibility = Visibility.Visible;
+                    dgJournalList.IsEnabled = false;
+                });
 
                 using (var scope = App.ServiceProvider.CreateScope())
                 {
                     var journalEntryService = scope.ServiceProvider.GetRequiredService<IJournalEntryService>();
                     var journalEntries = await journalEntryService.GetAllAsync();
 
-                    if (!journalEntries.Any())
+                    await Dispatcher.InvokeAsync(() =>
                     {
-                        MessageBox.Show("No journal entries found.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
-                    }
+                        if (!journalEntries.Any())
+                        {
+                            MessageBox.Show("No journal entries found.", "Info", MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
 
-                    dgJournalList.ItemsSource = journalEntries;
+                        dgJournalList.ItemsSource = journalEntries;
+                    });
                 }
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading journal entries: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    MessageBox.Show($"Error loading journal entries: {ex.Message}", "Error", MessageBoxButton.OK, MessageBoxImage.Error);
+                });
             }
             finally
             {
-                txtLoading.Visibility = Visibility.Hidden;
-                dgJournalList.IsEnabled = true;
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    txtLoading.Visibility = Visibility.Hidden;
+                    dgJournalList.IsEnabled = true;
+                });
             }
         }
+
 
         private void AddEntry_Click(object sender, RoutedEventArgs e)
         {
             var addWindow = App.ServiceProvider.GetRequiredService<AddJournalEntryWindow>();
             addWindow.ShowDialog();
-            LoadJournalEntries();
+             LoadJournalEntries();
+        }
+
+        private void Hyperlink_Click(object sender, RoutedEventArgs e)
+        {
+            var hyperlink = (Hyperlink)sender;
+            var journalEntry = (JournalEntryDTO)hyperlink.DataContext;
+
+            var editWindow = App.ServiceProvider.GetRequiredService<AddJournalEntryWindow>();
+            editWindow.LoadExistingJournalEntry(journalEntry.Id); 
+            editWindow.ShowDialog();
+            LoadJournalEntries(); 
         }
     }
 }

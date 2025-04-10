@@ -25,7 +25,8 @@ namespace JournalUI
                     string connectionString = "Data Source=DESKTOP-4F8B9BO\\MSSQLSERVER01;Initial Catalog=JournalDb;Integrated Security=True;Connect Timeout=30;Encrypt=True;Trust Server Certificate=True;Application Intent=ReadWrite;Multi Subnet Failover=False";
 
                     services.AddDbContext<ApplicationDbContext>(options =>
-                        options.UseSqlServer(connectionString));
+                        options.UseSqlServer(connectionString),
+                        ServiceLifetime.Scoped);
 
 
                     services.AddScoped<IJournalEntryRepository, JournalEntryRepository>();

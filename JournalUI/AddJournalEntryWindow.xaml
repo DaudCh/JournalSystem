@@ -1,132 +1,114 @@
 ﻿<Window x:Class="JournalUI.AddJournalEntryWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        
-        Title="Add Journal Entry" Height="450" Width="800"
-        FontFamily="Segoe UI" FontSize="14">
+        Title="Add Journal Entry" Height="700" Width="1000">
+
     <Grid Margin="10">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-
+            <RowDefinition Height="300"/>
             <RowDefinition Height="Auto"/>
-
-            <RowDefinition Height="Auto"/>
-
-            <RowDefinition Height="Auto"/>
-
-            <RowDefinition Height="Auto"/>
-
-            <RowDefinition Height="*"/>
-
-            <RowDefinition Height="Auto"/>
-
-            <RowDefinition Height="Auto"/>
-
-            <RowDefinition Height="Auto"/>
-
         </Grid.RowDefinitions>
 
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="Auto"/>
-            <ColumnDefinition Width="*"/>
-        </Grid.ColumnDefinitions>
+        <!-- Journal Header -->
+        <StackPanel Orientation="Vertical" Grid.Row="0" Margin="0,0,0,10">
+            <WrapPanel Margin="0,5">
+                <Label Content="Journal Number" Width="120"/>
+                <TextBox x:Name="txtJournalNumber" Width="150"/>
+                <Label Content="Journal Type" Width="120" Margin="20,0,0,0"/>
+                <ComboBox x:Name="cmbJournalType" Width="150" ItemsSource="{Binding JournalTypes}"/>
+                <Label Content="Status" Width="120" Margin="20,0,0,0"/>
+                <ComboBox x:Name="cmbStatus" Width="150" ItemsSource="{Binding Statuses}"/>
+            </WrapPanel>
+            <WrapPanel Margin="0,5">
+                <Label Content="Period" Width="120"/>
+                <ComboBox x:Name="cmbPeriod" Width="150" ItemsSource="{Binding Periods}"/>
+                <Label Content="Posting Date" Width="120" Margin="20,0,0,0"/>
+                <DatePicker x:Name="dpPostingDate" Width="150"/>
+                <Label Content="Document Date" Width="120" Margin="20,0,0,0"/>
+                <DatePicker x:Name="dpDocumentDate" Width="150"/>
+            </WrapPanel>
+            <WrapPanel Margin="0,5">
+                <Label Content="Currency" Width="120"/>
+                <ComboBox x:Name="cmbCurrency" Width="150" 
+          ItemsSource="{Binding Currencies}" 
+          DisplayMemberPath="Name" 
+          SelectedValuePath="Id"/>
 
-        <TextBlock Text="Journal Entry" Grid.Row="0" Grid.ColumnSpan="4" 
-                   FontSize="16" FontWeight="Bold" Margin="0,0,0,10"/>
-
-        <Label Content="Journal Number *" Grid.Row="1" Grid.Column="0" VerticalAlignment="Center" Margin="2"/>
-        <TextBox x:Name="txtJournalNumber" Grid.Row="1" Grid.Column="1" Margin="2" Height="25"/>
-
-        <Label Content="Journal Type *" Grid.Row="1" Grid.Column="2" VerticalAlignment="Center" Margin="2"/>
-        <ComboBox x:Name="cmbJournalType" Grid.Row="1" Grid.Column="3" Margin="2" Height="25"
-                 ItemsSource="{Binding JournalTypes}"/>
-
-        <Label Content="Period *" Grid.Row="2" Grid.Column="0" VerticalAlignment="Center" Margin="2"/>
-        <ComboBox x:Name="cmbPeriod" Grid.Row="2" Grid.Column="1" Margin="2" Height="25"
-                 ItemsSource="{Binding Periods}"/>
-
-        <Label Content="Posting Date *" Grid.Row="2" Grid.Column="2" VerticalAlignment="Center" Margin="2"/>
-        <DatePicker x:Name="dpPostingDate" Grid.Row="2" Grid.Column="3" Margin="2" Height="25"/>
-
-        <Label Content="Document Date *" Grid.Row="3" Grid.Column="0" VerticalAlignment="Center" Margin="2"/>
-        <DatePicker x:Name="dpDocumentDate" Grid.Row="3" Grid.Column="1" Margin="2" Height="25"/>
-
-
-        <Label Content="Currency *" Grid.Row="4" Grid.Column="0" VerticalAlignment="Center" Margin="2"/>
-        <ComboBox x:Name="cmbCurrency" Grid.Row="4" Grid.Column="1" Margin="2" Height="25"
-                ItemsSource="{Binding Currencies}"
-                DisplayMemberPath="Name"
-                SelectedValuePath="Code"/>
-        <Label Content="Status *" Grid.Row="3" Grid.Column="2" VerticalAlignment="Center" Margin="2"/>
-        <ComboBox x:Name="cmbStatus" Grid.Row="3" Grid.Column="3" Margin="2" Height="25"
-          ItemsSource="{Binding Statuses}" SelectedItem="Draft"/>
-
-        <Label Content="Exchange Rate *" Grid.Row="4" Grid.Column="2" VerticalAlignment="Center" Margin="2"/>
-        <TextBox x:Name="txtExchangeRate" Grid.Row="4" Grid.Column="3" Margin="2" Height="25"
-                Text="1.000000" TextAlignment="Right"
-                />
-
-
-        <TextBlock Text="Journal Line Entry" Grid.Row="5" Grid.ColumnSpan="4" 
-           FontWeight="Bold" Margin="0,10,0,5"/>
-
-        <Grid Grid.Row="6" Grid.ColumnSpan="4" Margin="0,0,0,10">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-                <RowDefinition Height="Auto"/>
-            </Grid.RowDefinitions>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
-
-            <Label Content="Account *" Grid.Row="0" Grid.Column="0" Margin="2"/>
-            <ComboBox x:Name="cmbAccount" Grid.Row="0" Grid.Column="1" Margin="2" Height="25"
-              ItemsSource="{Binding Account}" DisplayMemberPath="Name" SelectedValuePath="Id"/>
-
-            <Label Content="Cost Center *" Grid.Row="0" Grid.Column="2" Margin="2"/>
-            <ComboBox x:Name="cmbCostCenter" Grid.Row="0" Grid.Column="3" Margin="2" Height="25"
-              ItemsSource="{Binding CostCenter}" DisplayMemberPath="Name" SelectedValuePath="Id"/>
-
-            <Label Content="Dimension *" Grid.Row="1" Grid.Column="0" Margin="2"/>
-            <ComboBox x:Name="cmbDimension" Grid.Row="1" Grid.Column="1" Margin="2" Height="25"
-              ItemsSource="{Binding Dimensions}" DisplayMemberPath="Name" SelectedValuePath="Id"/>
-
-            <Label Content="Description" Grid.Row="1" Grid.Column="2" Margin="2"/>
-            <TextBox x:Name="txtDescription" Grid.Row="1" Grid.Column="3" Margin="2" Height="25"/>
-
-            <Label Content="Reference" Grid.Row="2" Grid.Column="0" Margin="2"/>
-            <TextBox x:Name="txtReference" Grid.Row="2" Grid.Column="1" Margin="2" Height="25"/>
-
-            <Label Content="Debit" Grid.Row="2" Grid.Column="2" Margin="2"/>
-            <TextBox x:Name="txtDebit" Grid.Row="2" Grid.Column="3" Margin="2" Height="25" TextAlignment="Right"/>
-
-            <Label Content="Credit" Grid.Row="3" Grid.Column="0" Margin="2"/>
-            <TextBox x:Name="txtCredit" Grid.Row="3" Grid.Column="1" Margin="2" Height="25" TextAlignment="Right"/>
-        </Grid>
-
-        <StackPanel Grid.Row="7" Grid.ColumnSpan="4" Orientation="Horizontal" 
-            HorizontalAlignment="Right" Margin="0,10,0,0">
-            <TextBlock Text="Total Debit:" VerticalAlignment="Center" Margin="5,0"/>
-            <TextBox Text="{Binding TotalDebit, StringFormat=N2}" Width="100" Margin="5,0" IsReadOnly="True"/>
-            <TextBlock Text="Total Credit:" VerticalAlignment="Center" Margin="5,0"/>
-            <TextBox Text="{Binding TotalCredit, StringFormat=N2}" Width="100" Margin="5,0" IsReadOnly="True"/>
-            <TextBlock Text="Difference:" VerticalAlignment="Center" Margin="5,0"/>
-            <TextBox Text="{Binding Difference, StringFormat=N2}" Width="100" Margin="5,0" IsReadOnly="True"/>
+                <Label Content="Exchange Rate" Width="120" Margin="20,0,0,0"/>
+                <TextBox x:Name="txtExchangeRate" Width="150"/>
+            </WrapPanel>
         </StackPanel>
 
+      <GroupBox Header="Journal Lines" Grid.Row="1">
+            <DockPanel>
+                <DataGrid ItemsSource="{Binding JournalLines}" AutoGenerateColumns="False" CanUserAddRows="False" Margin="0,0,0,5">
+                    <DataGrid.Columns>
+                        
+                     
+                        <DataGridTemplateColumn Header="Account">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ComboBox ItemsSource="{Binding DataContext.Account, RelativeSource={RelativeSource AncestorType=Window}}"
+                                      DisplayMemberPath="Name"
+                                      SelectedValuePath="Id"
+                                      SelectedValue="{Binding AccountId, Mode=TwoWay, ValidatesOnExceptions=True}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
 
-        <StackPanel Grid.Row="8" Grid.ColumnSpan="4" Orientation="Horizontal" 
-            HorizontalAlignment="Right" Margin="0,10,0,0">
-            <Button Content="Save" Width="80" Margin="5" Padding="10,2" Click="Save_Click"/>
-            <Button Content="Cancel" Width="80" Margin="5" Padding="10,2" Click="Cancel_Click"/>
+                        
+                        <DataGridTemplateColumn Header="Cost Center">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ComboBox ItemsSource="{Binding DataContext.CostCenter, RelativeSource={RelativeSource AncestorType=Window}}"
+                                      DisplayMemberPath="Name"
+                                      SelectedValuePath="Id"
+                                      SelectedValue="{Binding CostCenterId, Mode=TwoWay, ValidatesOnExceptions=True}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                   
+                        <DataGridTemplateColumn Header="Dimension">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <ComboBox ItemsSource="{Binding DataContext.Dimensions, RelativeSource={RelativeSource AncestorType=Window}}"
+                                      DisplayMemberPath="Name"
+                                      SelectedValuePath="Id"
+                                      SelectedValue="{Binding DimensionId, Mode=TwoWay, ValidatesOnExceptions=True}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                       
+                        <DataGridTextColumn Header="Description" Binding="{Binding Description}" Width="150"/>
+                        <DataGridTextColumn Header="Reference" Binding="{Binding Reference}" Width="100"/>
+                        <DataGridTextColumn Header="Debit" Binding="{Binding Debit}" Width="80"/>
+                        <DataGridTextColumn Header="Credit" Binding="{Binding Credit}" Width="80"/>
+
+                        <DataGridTemplateColumn Header="Bin" Width="60">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Button Content="🗑️" 
+                            Click="Button_Click_1" 
+                            Background="Transparent" 
+                            BorderThickness="0"
+                            ToolTip="Delete Line"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                    </DataGrid.Columns>
+                </DataGrid>
+            </DockPanel>
+        </GroupBox>
+
+       
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,10,0,0">
+            <Button Content="Add Line" Width="100" Margin="0,0,10,0" Click="Button_Click"/>
+            <Button Content="Save" Width="100" Margin="0,0,10,0" Click="Save_Click"/>
+            <Button Content="Cancel" Width="100" Click="Cancel_Click"/>
         </StackPanel>
-
     </Grid>
 </Window>

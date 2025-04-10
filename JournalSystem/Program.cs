@@ -2,6 +2,7 @@
 using Microsoft.Extensions.DependencyInjection;
 using JournalSystem.Repositories.Context;
 using Microsoft.EntityFrameworkCore;
+using static System.Formats.Asn1.AsnWriter;
 
 
 
@@ -46,6 +47,7 @@ namespace JournalSystem
               // Database Context
               services.AddDbContext<ApplicationDbContext>(options =>
                   options.UseSqlServer("Data Source=DESKTOP-4F8B9BO\\MSSQLSERVER01;Initial Catalog=JournalDb;Integrated Security=True;Encrypt=True;Trust Server Certificate=True;"));
+             
 
 
 

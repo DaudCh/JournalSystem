@@ -5,7 +5,7 @@ using JournalSystem.Core.DTOS.Currency;
 using JournalSystem.Core.DTOS.Dimension;
 using JournalSystem.Core.DTOS.JournalEntry;
 using JournalSystem.Core.DTOS.JournalLines;
-using JournalSystem.Core.Entities; // Ensure this namespace contains your entity classes
+using JournalSystem.Core.Entities; 
 
 public class MappingProfile : Profile
 {
@@ -32,13 +32,24 @@ public class MappingProfile : Profile
         CreateMap<Dimension, DimensionResponseDTO>().ReverseMap();
 
 
-        CreateMap<CreateJournalEntryDTO, JournalEntry>();
+        CreateMap<CreateJournalEntryDTO, JournalEntry>()
+             .ForMember(dest => dest.JournalLines, opt => opt.MapFrom(src => src.JournalLines));
         CreateMap<JournalEntry, UpdateJournalEntryDTO>().ReverseMap();
-        CreateMap<JournalEntry, JournalEntryDTO>().ReverseMap();
+        CreateMap<JournalEntry, JournalEntryDTO>()
+
+           .ForMember(dest => dest.CurrencyId, opt => opt.MapFrom(src => src.Currency.Id))
+           .ForMember(dest => dest.TotalDebit, opt => opt.MapFrom(src => src.JournalLines.Sum(jl => jl.Debit)))
+           .ForMember(dest => dest.TotalCredit, opt => opt.MapFrom(src => src.JournalLines.Sum(jl => jl.Credit)))
+           .ForMember(dest => dest.JournalLines, opt => opt.MapFrom(src => src.JournalLines));
         CreateMap<JournalEntry, JournalEntryWithLinesDTO>().ReverseMap();
 
 
-        CreateMap<CreateJournalLineDTO, JournalLine>();
+        // In your AutoMapper Profile (e.g., MappingProfile.cs)
+        CreateMap<CreateJournalLineDTO, JournalLine>()
+            .ForMember(dest => dest.JournalEntry, opt => opt.Ignore())  // Navigation properties
+            .ForMember(dest => dest.Account, opt => opt.Ignore())
+            .ForMember(dest => dest.CostCenter, opt => opt.Ignore())
+            .ForMember(dest => dest.Dimension, opt => opt.Ignore());
         CreateMap<JournalLine, UpdateJournalLineDTO>().ReverseMap();
         CreateMap<JournalLine, JournalLineDTO>().ReverseMap();
         CreateMap<JournalEntry, JournalEntryLinesDTO>().ReverseMap();

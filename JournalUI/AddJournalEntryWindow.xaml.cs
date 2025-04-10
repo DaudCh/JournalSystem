@@ -10,6 +10,8 @@ using Microsoft.EntityFrameworkCore;
 using JournalSystem.Core.DTOS.Account;
 using JournalSystem.Core.DTOS.CostCentre;
 using JournalSystem.Core.DTOS.Dimension;
+using System.Windows.Controls;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace JournalUI
 {
@@ -30,6 +32,8 @@ namespace JournalUI
         public ObservableCollection<CostCenterResponseDTO> CostCenter { get; } = new();
         public ObservableCollection<DimensionResponseDTO> Dimensions { get; } = new();
         public ObservableCollection<JournalLineDTO> JournalLines { get; } = new();
+        private bool _isEditMode = false;
+        private int _existingEntryId = 0;
 
         public AddJournalEntryWindow(
             IJournalEntryService journalEntryService,
@@ -50,7 +54,6 @@ namespace JournalUI
             _journalEntryRepository = journalEntryRepository;
 
             LoadDropdownData();
-
         }
 
         private async void LoadDropdownData()
@@ -59,109 +62,151 @@ namespace JournalUI
             {
                 var journalEntries = await _journalEntryRepository.GetAllAsync();
 
-                JournalTypes.Clear();
-                foreach (var type in journalEntries.Select(j => j.JournalType).Distinct())
-                    JournalTypes.Add(type);
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    JournalTypes.Clear();
+                    Periods.Clear();
+                    foreach (var type in journalEntries.Select(j => j.JournalType).Distinct())
+                        JournalTypes.Add(type);
 
-                Periods.Clear();
-                foreach (var period in journalEntries.Select(j => j.Period).Distinct())
-                    Periods.Add(period);
-
+                    foreach (var period in journalEntries.Select(j => j.Period).Distinct())
+                        Periods.Add(period);
+                });
 
                 var currencies = await _currencyService.GetAllAsync();
-                Currencies.Clear();
-                foreach (var currency in currencies)
-                    Currencies.Add(currency);
-
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    Currencies.Clear();
+                    foreach (var currency in currencies)
+                        Currencies.Add(currency);
+                });
 
                 var accounts = await _accountService.GetAllAsync();
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    Account.Clear();
+                    foreach (var account in accounts)
+                        Account.Add(account);
+                });
+
                 var costCenters = await _costCenterService.GetAllAsync();
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    CostCenter.Clear();
+                    foreach (var cc in costCenters)
+                        CostCenter.Add(cc);
+                });
+
                 var dimensions = await _dimensionService.GetAllAsync();
-
-                Account.Clear();
-                foreach (var account in accounts)
-                    Account.Add(account);
-
-                CostCenter.Clear();
-                foreach (var cc in costCenters)
-                    CostCenter.Add(cc);
-
-                Dimensions.Clear();
-                foreach (var dim in dimensions)
-                    Dimensions.Add(dim);
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    Dimensions.Clear();
+                    foreach (var dim in dimensions)
+                        Dimensions.Add(dim);
+                });
             }
             catch (Exception ex)
             {
-                MessageBox.Show($"Error loading dropdown data: {ex.Message}");
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    MessageBox.Show($"Error loading dropdown data: {ex.Message}");
+                });
             }
         }
+
 
         private async void Save_Click(object sender, RoutedEventArgs e)
         {
             try
             {
+               
                 if (!int.TryParse(txtJournalNumber.Text, out int journalNumber))
                 {
                     MessageBox.Show("Invalid Journal Number");
                     return;
                 }
 
-
-                if (cmbJournalType.SelectedItem == null)
+                if (cmbJournalType.SelectedItem == null || cmbPeriod.SelectedItem == null ||
+                    cmbCurrency.SelectedItem == null || !float.TryParse(txtExchangeRate.Text, out float exchangeRate))
                 {
-                    MessageBox.Show("Please select a Journal Type");
+                    MessageBox.Show("Please ensure all fields are filled correctly.");
                     return;
                 }
 
-                if (cmbPeriod.SelectedItem == null)
+                if (JournalLines.Count == 0)
                 {
-                    MessageBox.Show("Please select a Period");
+                    MessageBox.Show("Please add at least one journal line before saving.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
 
-                if (cmbCurrency.SelectedItem == null)
+                
+                foreach (var line in JournalLines)
                 {
-                    MessageBox.Show("Please select a Currency");
+                    if (!line.AccountId.HasValue ||
+                        !line.CostCenterId.HasValue ||
+                        !line.DimensionId.HasValue ||
+                        string.IsNullOrWhiteSpace(line.Description) ||
+                        string.IsNullOrWhiteSpace(line.Reference) ||
+                        (line.Debit == 0 && line.Credit == 0))
+                    {
+                        MessageBox.Show("Please complete all fields for each journal line. Debit or Credit must also be filled.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
+                        return;
+                    }
+                }
+                var totalDebit = JournalLines.Sum(jl => jl.Debit);
+                var totalCredit = JournalLines.Sum(jl => jl.Credit);
+
+                if (totalDebit != totalCredit)
+                {
+                    MessageBox.Show("Total Debit must be equal to Total Credit.", "Validation Error", MessageBoxButton.OK, MessageBoxImage.Warning);
                     return;
                 }
-
-                if (!float.TryParse(txtExchangeRate.Text, out float exchangeRate))
+                var journalLineDTOs =JournalLines.Select(jl => new CreateJournalLineDTO
                 {
-                    MessageBox.Show("Invalid Exchange Rate");
-                    return;
-                }
-
-                // Convert JournalLines ObservableCollection to List<CreateJournalLineDTO>
-                var journalLineDTOs = JournalLines.Select(jl => new CreateJournalLineDTO
-                {
-                    AccountId = jl.AccountId,
-                    CostCenterId = jl.CostCenterId,
-                    DimensionId = jl.DimensionId,
+                    AccountId = jl.AccountId ?? 0,
+                    CostCenterId = jl.CostCenterId ?? 0,
+                    DimensionId = jl.DimensionId ?? 0,
                     Description = jl.Description,
                     Reference = jl.Reference,
-                    Debit = (float)jl.Debit,
-                    Credit = (float)jl.Credit
+                    Debit = jl.Debit,
+                    Credit = jl.Credit
                 }).ToList();
-
-
-
-                // Build main JournalEntry DTO
-                var entry = new CreateJournalEntryDTO
+                if (_isEditMode && _existingEntryId > 0)
                 {
-                    JournalNumber = journalNumber,
-                    Status = cmbStatus.SelectedItem?.ToString() ?? "Draft",
-                    JournalType = cmbJournalType.SelectedItem.ToString(),
-                    Period = cmbPeriod.SelectedItem.ToString(),
-                    PostingDate = dpPostingDate.SelectedDate ?? DateTime.Now,
-                    DocumentDate = dpDocumentDate.SelectedDate ?? DateTime.Now,
-                    CurrencyId = (cmbCurrency.SelectedItem as CurrencyResponseDTO)?.Id ?? 0,
-                    ExchangeRate = exchangeRate,
-                    JournalLines = journalLineDTOs
-                };
+                    // Update existing entry
+                    var updateEntry = new UpdateJournalEntryDTO
+                    {
+                        Id = _existingEntryId,
+                        JournalNumber = journalNumber,
+                        Status = cmbStatus.SelectedItem?.ToString() ?? "Draft",
+                        JournalType = cmbJournalType.SelectedItem.ToString(),
+                        Period = cmbPeriod.SelectedItem.ToString(),
+                        PostingDate = dpPostingDate.SelectedDate ?? DateTime.Now,
+                        DocumentDate = dpDocumentDate.SelectedDate ?? DateTime.Now,
+                        CurrencyId = (cmbCurrency.SelectedItem as CurrencyResponseDTO)?.Id ?? 0,
+                        ExchangeRate = exchangeRate,
+                        JournalLines = journalLineDTOs
+                    };
 
-                // Save to database
-                await _journalEntryService.AddAsync(entry);
+                    await _journalEntryService.UpdateAsync(updateEntry);
+                }
+                else
+                {
+                    var entry = new CreateJournalEntryDTO
+                    {
+                        JournalNumber = journalNumber,
+                        Status = cmbStatus.SelectedItem?.ToString() ?? "Draft",
+                        JournalType = cmbJournalType.SelectedItem.ToString(),
+                        Period = cmbPeriod.SelectedItem.ToString(),
+                        PostingDate = dpPostingDate.SelectedDate ?? DateTime.Now,
+                        DocumentDate = dpDocumentDate.SelectedDate ?? DateTime.Now,
+                        CurrencyId = (cmbCurrency.SelectedItem as CurrencyResponseDTO)?.Id ?? 0,
+                        ExchangeRate = exchangeRate,
+                        JournalLines = journalLineDTOs
+                    };
 
+                    await _journalEntryService.AddAsync(entry);
+                }
                 MessageBox.Show("Journal Entry saved successfully!");
                 Close();
             }
@@ -174,7 +219,79 @@ namespace JournalUI
                 MessageBox.Show($"Error: {ex.Message}");
             }
         }
+       
+
 
         private void Cancel_Click(object sender, RoutedEventArgs e) => Close();
+
+        private void Button_Click(object sender, RoutedEventArgs e)
+        {
+            JournalLines.Add(new JournalLineDTO());
+        }
+
+        private void Button_Click_1(object sender, RoutedEventArgs e)
+        {
+            var button = sender as Button;
+            if (button?.DataContext is JournalLineDTO lineToRemove)
+            {
+                JournalLines.Remove(lineToRemove);
+            }
+        }
+
+
+
+        public async void LoadExistingJournalEntry(int id)
+        {
+            try
+            {
+                _isEditMode = true;
+                _existingEntryId = id;
+
+                using (var scope = App.ServiceProvider.CreateScope())
+                {
+                    var journalService = scope.ServiceProvider.GetRequiredService<IJournalEntryService>();
+                    var existingEntry = await journalService.GetByIdAsync(id);
+
+                    await Dispatcher.InvokeAsync(() =>
+                    {
+                        txtJournalNumber.Text = existingEntry.JournalNumber.ToString();
+                        cmbJournalType.SelectedItem = existingEntry.JournalType;
+                        cmbStatus.SelectedItem = existingEntry.Status;
+                        cmbPeriod.SelectedItem = existingEntry.Period;
+                        dpPostingDate.SelectedDate = existingEntry.PostingDate;
+                        dpDocumentDate.SelectedDate = existingEntry.DocumentDate;
+
+                        // Ensure Currencies are populated before selecting the currency
+                        cmbCurrency.SelectedItem = Currencies.FirstOrDefault(c => c.Id == existingEntry.CurrencyId);
+
+                        txtExchangeRate.Text = existingEntry.ExchangeRate.ToString();
+
+                        JournalLines.Clear();
+                        foreach (var line in existingEntry.JournalLines)
+                        {
+                            JournalLines.Add(new JournalLineDTO
+                            {
+                                AccountId = line.AccountId,
+                                CostCenterId = line.CostCenterId,
+                                DimensionId = line.DimensionId,
+                                Description = line.Description,
+                                Reference = line.Reference,
+                                Debit = line.Debit,
+                                Credit = line.Credit
+                            });
+                        }
+                    });
+                }
+            }
+            catch (Exception ex)
+            {
+                await Dispatcher.InvokeAsync(() =>
+                {
+                    MessageBox.Show($"Error loading journal entry: {ex.Message}");
+                });
+            }
+        }
+
+
     }
 }

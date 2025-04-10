@@ -41,44 +41,24 @@ namespace JournalSystem.Services
             return _mapper.Map<JournalEntryDTO>(journalEntry);
         }
 
-        public async Task AddAsync(CreateJournalEntryDTO dto, CancellationToken cancellationToken = default)
+        public async Task AddAsync(CreateJournalEntryDTO journalEntryDTO, CancellationToken cancellationToken)
         {
-            if (dto == null) throw new ArgumentNullException(nameof(dto));
+            if (journalEntryDTO == null) throw new ArgumentNullException(nameof(journalEntryDTO));
+            var entry = _mapper.Map<JournalEntry>(journalEntryDTO);
 
-            var entry = _mapper.Map<JournalEntry>(dto);
-            await _journalEntryRepository.AddAsync(entry, cancellationToken);
 
-            if (entry.Id == 0)
-            {
-                throw new Exception("JournalEntry Id is not populated after save.");
-            }
-            var journalLines = dto.JournalLines.Select(lineDto => new JournalLine
-            {
-                JournalEntryId = entry.Id,
-                AccountId = lineDto.AccountId,
-                CostCenterId = lineDto.CostCenterId,
-                DimensionId = lineDto.DimensionId,
-                Description = lineDto.Description,
-                Reference = lineDto.Reference,
-                Debit = lineDto.Debit,
-                Credit = lineDto.Credit
-            }).ToList();
-
-            Console.WriteLine($"Adding {journalLines.Count} journal lines.");
-            await _journalEntryRepository.AddJournalLinesAsync(journalLines, cancellationToken);
-            Console.WriteLine("Journal lines added successfully.");
+            await _journalEntryRepository.AddAsync(entry);
         }
-
-
-
-
 
         public async Task UpdateAsync(UpdateJournalEntryDTO journalEntryDTO, CancellationToken cancellationToken = default)
         {
             if (journalEntryDTO == null) throw new ArgumentNullException(nameof(journalEntryDTO));
 
-            var journalEntry = _mapper.Map<JournalEntry>(journalEntryDTO);
-            await _journalEntryRepository.UpdateAsync(journalEntry, cancellationToken);
+            var existingEntry = await _journalEntryRepository.GetByIdAsync(journalEntryDTO.Id, cancellationToken);
+            if (existingEntry == null) throw new InvalidOperationException("Journal entry not found.");
+
+            _mapper.Map(journalEntryDTO, existingEntry); 
+            await _journalEntryRepository.UpdateAsync(existingEntry, cancellationToken);
         }
 
         public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)

@@ -21,27 +21,31 @@ namespace JournalSystem.Repositories
             await _context.SaveChangesAsync(cancelelationToken);
         }
 
-     public async Task UpdateAsync(JournalEntry journalEntry, CancellationToken cancellationToken = default)
+        public async Task UpdateAsync(JournalEntry journalEntry, CancellationToken cancellationToken = default)
         {
-            if(journalEntry == null)
+            if (journalEntry == null)
             {
                 throw new ArgumentNullException(nameof(journalEntry));
             }
-            _context.JournalEntries.Update(journalEntry);
-            await _context.SaveChangesAsync(cancellationToken);
-        }
+            _context.Entry(journalEntry).State = EntityState.Modified;
+            await _context.SaveChangesAsync();
+        }   
 
-     public async Task<IEnumerable<JournalEntry>> GetAllAsync(CancellationToken cancellationToken = default)
+            public async Task<IEnumerable<JournalEntry>> GetAllAsync(CancellationToken cancellationToken = default)
         {
-            var Journal = await _context.JournalEntries.ToListAsync(cancellationToken);
+            var Journal = await _context.JournalEntries
+                         .Include(je => je.Currency) 
+                         .Include(je => je.JournalLines) 
+                         .ToListAsync(cancellationToken);
             return Journal;
         }
-        
-     public async Task<JournalEntry> GetByIdAsync(int id, CancellationToken cancellationToken = default)
+
+        public async Task<JournalEntry> GetByIdAsync(int id, CancellationToken cancellationToken = default)
         {
-            if(id < 0) throw new ArgumentOutOfRangeException(nameof(id));
-            var journal = await _context.JournalEntries.FindAsync(cancellationToken);
-            return journal;
+            return await _context.JournalEntries
+                .Include(je => je.Currency)
+                .Include(je => je.JournalLines)
+                .FirstOrDefaultAsync(je => je.Id == id, cancellationToken);
         }
 
         public async Task DeleteAsync(int id, CancellationToken cancellationToken = default)
